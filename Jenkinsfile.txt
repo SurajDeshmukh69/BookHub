@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                echo 'Cloning source code from GitHub...'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvnw.cmd clean package'
+            }
+        }
+
+    }
+}
