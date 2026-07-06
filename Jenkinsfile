@@ -9,7 +9,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/SurajDeshmukh69/BookHub.git'
+                git branch: 'main',
+                    url: 'https://github.com/SurajDeshmukh69/BookHub.git'
             }
         }
 
