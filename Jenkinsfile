@@ -25,5 +25,12 @@ pipeline {
                 bat 'docker build -t bookhub:v1 .'
             }
         }
+
+        stage('Start Docker Container'){
+             steps {
+                bat 'docker run -d --restart unless-stopped -p 9095:9095 --name bookhub-container bookhub:v1'
+             }
+
+        }
     }
 }
