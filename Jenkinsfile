@@ -26,11 +26,22 @@ pipeline {
             }
         }
 
-        stage('Start Docker Container'){
-             steps {
-                bat 'docker run -d --restart unless-stopped -p 9095:9095 --name bookhub-container bookhub:v1'
-             }
+        stage('Stop Old Container') {
+            steps {
+                bat 'docker stop bookhub-container || exit /b 0'
+            }
+        }
 
+        stage('Remove Old Container') {
+            steps {
+                bat 'docker rm bookhub-container || exit /b 0'
+            }
+        }
+        
+        stage('Run Container') {
+            steps {
+                bat 'docker run -d --restart unless-stopped -p 9095:9095 --name bookhub-container bookhub:v1'
+            }
         }
     }
 }
