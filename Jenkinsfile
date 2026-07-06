@@ -5,6 +5,10 @@ pipeline {
         jdk 'JDK21'
     }
 
+    environment {
+        SCANNER_HOME = tool 'SonarScanner'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -20,27 +24,33 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    bat """
+                    %SCANNER_HOME%\\bin\\sonar-scanner.bat ^
+                    -Dsonar.projectKey=BookHub ^
+                    -Dsonar.projectName=BookHub ^
+                    -Dsonar.sources=src ^
+                    -Dsonar.java.binaries=target/classes
+                    """
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 bat 'docker build -t bookhub:v1 .'
             }
         }
 
-        stage('Stop Old Container') {
+        stage('Deploy Container') {
             steps {
-                bat 'docker stop bookhub-container || exit /b 0'
-            }
-        }
-
-        stage('Remove Old Container') {
-            steps {
-                bat 'docker rm bookhub-container || exit /b 0'
-            }
-        }
-        
-        stage('Run Container') {
-            steps {
-                bat 'docker run -d --restart unless-stopped -p 9095:9095 --name bookhub-container bookhub:v1'
+                bat '''
+                docker stop bookhub-container || exit 0
+                docker rm bookhub-container || exit 0
+                docker run -d -p 9095:9095 --name bookhub-container bookhub:v1
+                '''
             }
         }
     }

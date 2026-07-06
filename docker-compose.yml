@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+
+  bookhub:
+    image: bookhub:v1
+    container_name: bookhub-container
+
+    ports:
+      - "9095:9095"
+
+    restart: unless-stopped
