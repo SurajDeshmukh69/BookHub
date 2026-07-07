@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bookhub-deployment
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: bookhub
+
+  template:
+    metadata:
+      labels:
+        app: bookhub
+
+    spec:
+      containers:
+        - name: bookhub
+          image: bookhub:v1
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 9095
