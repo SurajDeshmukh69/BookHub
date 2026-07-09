@@ -5,26 +5,12 @@ pipeline {
         jdk 'JDK21'
     }
 
-    environment {
-        SCANNER_HOME = tool 'SonarScanner'
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/SurajDeshmukh69/BookHub.git'
-            }
-        }
-
-        stage('Debug') {
-            steps {
-                bat '''
-                whoami
-                echo USERPROFILE=%USERPROFILE%
-                dir %USERPROFILE%\\.kube
-                '''
             }
         }
 
@@ -42,15 +28,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    bat """
-                    %SCANNER_HOME%\\bin\\sonar-scanner.bat ^
-                    -Dsonar.projectKey=BookHub ^
-                    -Dsonar.projectName=BookHub ^
-                    -Dsonar.sources=src ^
-                    -Dsonar.java.binaries=target/classes
-                    """
-                }
+                bat 'mvnw.cmd sonar:sonar'
             }
         }
 
@@ -65,9 +43,38 @@ pipeline {
                 bat '''
                 docker stop bookhub-container || exit 0
                 docker rm bookhub-container || exit 0
-                docker run -d -p 9095:9095 --name bookhub-container bookhub:v1
+                docker run -d --name bookhub-container -p 9095:9095 bookhub:v1
                 '''
             }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat '''
+                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f k8s/service.yaml
+                '''
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                bat '''
+                kubectl rollout status deployment/bookhub-deployment
+                kubectl get pods
+                kubectl get services
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
