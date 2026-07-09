@@ -18,6 +18,12 @@ pipeline {
             }
         }
 
+        stage('Check Kubernetes') {
+            steps {
+                bat 'kubectl get nodes'
+            }
+        }
+
         stage('Build') {
             steps {
                 bat 'mvnw.cmd clean package'
