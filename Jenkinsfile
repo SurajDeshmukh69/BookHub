@@ -18,6 +18,16 @@ pipeline {
             }
         }
 
+        stage('Debug') {
+            steps {
+                bat '''
+                whoami
+                echo USERPROFILE=%USERPROFILE%
+                dir %USERPROFILE%\\.kube
+                '''
+            }
+        }
+
         stage('Check Kubernetes') {
             steps {
                 bat 'kubectl get nodes'
