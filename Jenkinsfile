@@ -28,7 +28,16 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                bat 'mvnw.cmd sonar:sonar'
+                withSonarQubeEnv('SonarQube') {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        bat """
+                        mvn clean verify sonar:sonar ^
+                        -Dsonar.projectKey=BookHub ^
+                        -Dsonar.host.url=http://localhost:9000 ^
+                        -Dsonar.login=%SONAR_TOKEN%
+                        """
+                    }
+                }
             }
         }
 
