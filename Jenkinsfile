@@ -48,18 +48,14 @@ pipeline {
             }
         }
 
-        stage('Docker Login Test') {
+        stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
                         credentialsId: 'DockerHub',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    bat '''
-            echo Username = %DOCKER_USER%
-            echo Password Length Test
-            echo %DOCKER_PASS%
-            '''
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
                 }
             }
         }
