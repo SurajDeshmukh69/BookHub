@@ -27,6 +27,17 @@ pipeline {
             }
         }
 
+        stage('Check Jenkins User') {
+            steps {
+                bat '''
+        whoami
+        echo.
+        echo USERPROFILE=%USERPROFILE%
+        docker context ls
+        '''
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
