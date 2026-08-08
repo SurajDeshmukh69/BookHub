@@ -1,7 +1,6 @@
 pipeline {
     agent any
-
-    ```
+    
     stages {
 
         stage('Checkout') {
@@ -123,6 +122,5 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
-    ```
 
 }
